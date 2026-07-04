@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharukh Ahmed — Full Stack Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0D0F14;
+    --surface:#151824;
+    --surface-2:#1C2030;
+    --line:#2A2F42;
+    --text:#E8E6DF;
+    --muted:#8B8FA3;
+    --amber:#E8A33D;
+    --teal:#4FD1C5;
+    --red:#E8637A;
+    --mono:'JetBrains Mono', monospace;
+    --sans:'Inter', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--amber);color:var(--ink);}
+
+  .bg-grid{
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(232,230,223,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,230,223,0.025) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;
+    padding:0 20px;
+    height:52px;
+    backdrop-filter:blur(6px);
+  }
+  .topbar .dots{display:flex;gap:7px;margin-right:20px;}
+  .topbar .dot{width:11px;height:11px;border-radius:50%;}
+  .dot.r{background:#E8637A;} .dot.y{background:#E8A33D;} .dot.g{background:#4FD1C5;}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    font-family:var(--mono);font-size:12.5px;
+    color:var(--muted);
+    padding:8px 16px;
+    border-right:1px solid var(--line);
+    white-space:nowrap;
+    cursor:pointer;
+    transition:color .2s, background .2s;
+  }
+  .tab:hover{color:var(--text);background:var(--surface-2);}
+  .tab.active{color:var(--amber);background:var(--ink);border-bottom:2px solid var(--amber);}
+
+  section{position:relative;z-index:1;}
+
+  .hero{
+    min-height:92vh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:60px 8vw;
+    max-width:1200px;margin:0 auto;
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:13px;color:var(--teal);
+    letter-spacing:.08em;margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:8px;height:8px;background:var(--teal);border-radius:50%;box-shadow:0 0 8px var(--teal);}
+  h1.name{
+    font-family:var(--mono);font-weight:800;
+    font-size:clamp(2.4rem, 7vw, 5rem);
+    line-height:1.05;
+    letter-spacing:-.02em;
+    margin-bottom:8px;
+  }
+  h1.name .last{color:var(--amber);}
+  .role-line{
+    font-family:var(--mono);font-size:clamp(1rem,2.4vw,1.35rem);
+    color:var(--muted);margin-bottom:36px;
+  }
+  .role-line .cursor{display:inline-block;width:9px;height:1.1em;background:var(--amber);vertical-align:text-bottom;animation:blink 1s steps(1) infinite;margin-left:2px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .terminal{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    max-width:640px;
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
+    overflow:hidden;
+  }
+  .terminal-head{
+    display:flex;align-items:center;gap:7px;
+    padding:10px 14px;border-bottom:1px solid var(--line);
+    background:var(--surface-2);
+  }
+  .terminal-head .tdot{width:10px;height:10px;border-radius:50%;}
+  .terminal-head span.fname{
+    font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:8px;
+  }
+  .terminal-body{padding:18px 20px;font-family:var(--mono);font-size:13.5px;}
+  .terminal-body .line{margin-bottom:6px;color:var(--muted);}
+  .terminal-body .prompt{color:var(--teal);}
+  .terminal-body .out{color:var(--text);}
+  .terminal-body .key{color:var(--amber);}
+
+  .hero-cta{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    padding:12px 22px;border-radius:6px;
+    border:1px solid var(--line);
+    transition:transform .15s, border-color .15s, background .15s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn.primary{background:var(--amber);color:var(--ink);border-color:var(--amber);}
+  .btn.primary:hover{transform:translateY(-2px);}
+  .btn.ghost:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px);}
+
+  .wrap{max-width:1200px;margin:0 auto;padding:110px 8vw;}
+  .sec-head{margin-bottom:56px;}
+  .sec-tag{font-family:var(--mono);font-size:12.5px;color:var(--teal);letter-spacing:.08em;margin-bottom:10px;}
+  .sec-title{font-family:var(--mono);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;}
+  .sec-title .comment{color:var(--muted);font-weight:400;}
+
+  .about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:start;}
+  .about-grid p{color:var(--muted);font-size:1.02rem;margin-bottom:18px;max-width:56ch;}
+  .about-grid strong{color:var(--text);}
+  .stat-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:22px 24px;margin-bottom:14px;
+  }
+  .stat-card .num{font-family:var(--mono);font-size:1.9rem;font-weight:700;color:var(--amber);}
+  .stat-card .lbl{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px;}
+  @media(max-width:800px){.about-grid{grid-template-columns:1fr;}}
+
+  .pkg{
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    overflow:hidden;
+  }
+  .pkg-head{display:flex;align-items:center;gap:7px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);}
+  .pkg-head .tdot{width:10px;height:10px;border-radius:50%;}
+  .pkg-head span{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:6px;}
+  .pkg-body{padding:26px 30px;font-family:var(--mono);font-size:13.5px;overflow-x:auto;}
+  .pkg-body .l{color:var(--muted);}
+  .pkg-body .key{color:var(--teal);}
+  .pkg-body .val{color:var(--amber);}
+  .pkg-body .str{color:#B9E8A0;}
+  .indent{padding-left:24px;}
+  .indent2{padding-left:48px;}
+
+  .projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;}
+  .proj-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:0;overflow:hidden;
+    transition:border-color .2s, transform .2s;
+  }
+  .proj-card:hover{border-color:var(--amber);transform:translateY(-4px);}
+  .proj-top{padding:18px 20px 0;}
+  .proj-file{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;}
+  .proj-file .status{color:var(--teal);}
+  .proj-title{font-family:var(--mono);font-size:1.15rem;font-weight:700;margin-bottom:10px;}
+  .proj-desc{color:var(--muted);font-size:.92rem;padding:0 20px;margin-bottom:16px;}
+  .proj-stack{display:flex;flex-wrap:wrap;gap:7px;padding:0 20px 20px;}
+  .chip{font-family:var(--mono);font-size:11px;padding:4px 9px;border:1px solid var(--line);border-radius:20px;color:var(--muted);}
+  .proj-links{display:flex;border-top:1px solid var(--line);}
+  .proj-links a{flex:1;text-align:center;padding:12px;font-family:var(--mono);font-size:12px;color:var(--muted);border-right:1px solid var(--line);}
+  .proj-links a:last-child{border-right:none;}
+  .proj-links a:hover{color:var(--amber);background:var(--surface-2);}
+
+  .gitlog{border-left:2px solid var(--line);margin-left:8px;}
+  .commit{position:relative;padding:0 0 40px 32px;}
+  .commit:last-child{padding-bottom:0;}
+  .commit::before{
+    content:'';position:absolute;left:-7px;top:4px;
+    width:12px;height:12px;border-radius:50%;
+    background:var(--ink);border:2px solid var(--amber);
+  }
+  .commit-hash{font-family:var(--mono);font-size:12px;color:var(--teal);margin-bottom:6px;}
+  .commit-msg{font-family:var(--mono);font-weight:700;font-size:1.05rem;margin-bottom:6px;}
+  .commit-meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px;}
+  .commit-body{color:var(--muted);font-size:.95rem;max-width:60ch;}
+
+  .contact-box{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:50px 8vw;text-align:center;
+  }
+  .contact-box .sec-title{margin-bottom:14px;}
+  .contact-box p{color:var(--muted);max-width:50ch;margin:0 auto 30px;}
+  .contact-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+
+  footer{
+    text-align:center;padding:30px;font-family:var(--mono);font-size:12px;color:var(--muted);
+    border-top:1px solid var(--line);
+  }
+
+  /* ---- reveal-on-scroll ---- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.16,.8,.3,1), transform .7s cubic-bezier(.16,.8,.3,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+  .reveal-stagger > *{opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.16,.8,.3,1), transform .6s cubic-bezier(.16,.8,.3,1);}
+  .reveal-stagger.in > *{opacity:1;transform:translateY(0);}
+  .reveal-stagger.in > *:nth-child(1){transition-delay:.05s;}
+  .reveal-stagger.in > *:nth-child(2){transition-delay:.15s;}
+  .reveal-stagger.in > *:nth-child(3){transition-delay:.25s;}
+  .reveal-stagger.in > *:nth-child(4){transition-delay:.35s;}
+  .reveal-stagger.in > *:nth-child(5){transition-delay:.45s;}
+
+  /* ---- hero polish ---- */
+  .hero{animation:heroIn .8s cubic-bezier(.16,.8,.3,1) both;}
+  @keyframes heroIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .eyebrow::before{animation:pulseDot 2s ease-in-out infinite;}
+  @keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(79,209,197,.55);}50%{box-shadow:0 0 0 5px rgba(79,209,197,0);}}
+
+  .role-line{min-height:1.6em;}
+  .role-line .typed{border-right:2px solid var(--amber);padding-right:2px;}
+
+  .terminal-body .line{opacity:0;animation:lineIn .35s ease forwards;}
+  @keyframes lineIn{to{opacity:1;}}
+
+  /* ---- background grid drift ---- */
+  .bg-grid{animation:gridDrift 26s linear infinite;}
+  @keyframes gridDrift{from{background-position:0 0, 0 0;}to{background-position:40px 40px, -40px 40px;}}
+
+  /* ---- stat / pkg / proj micro-interactions ---- */
+  .stat-card, .proj-card, .pkg, .terminal{transition:border-color .25s, transform .25s, box-shadow .25s;}
+  .stat-card:hover{border-color:var(--teal);transform:translateY(-3px);}
+  .pkg:hover{border-color:var(--teal);}
+  .terminal:hover{box-shadow:0 24px 70px rgba(0,0,0,.5);}
+
+  .proj-file .status{position:relative;padding-left:14px;}
+  .proj-file .status::before{
+    content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:7px;height:7px;border-radius:50%;background:currentColor;
+    animation:statusPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes statusPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 currentColor;}50%{opacity:.6;box-shadow:0 0 0 4px transparent;}}
+
+  .chip{transition:border-color .2s, color .2s;}
+  .proj-card:hover .chip{border-color:var(--amber);color:var(--text);}
+
+  .btn{position:relative;overflow:hidden;}
+  .btn::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.18), transparent);
+    transform:translateX(-120%);
+  }
+  .btn:hover::after{transform:translateX(120%);transition:transform .6s ease;}
+
+  .commit{opacity:0;transform:translateX(-16px);transition:opacity .55s cubic-bezier(.16,.8,.3,1), transform .55s cubic-bezier(.16,.8,.3,1);}
+  .commit.in{opacity:1;transform:translateX(0);}
+  .commit::before{transition:box-shadow .3s, transform .3s;}
+  .commit.in::before{animation:commitPop .4s cubic-bezier(.34,1.56,.64,1) .1s both;}
+  @keyframes commitPop{from{transform:scale(0);}to{transform:scale(1);}}
+
+  .contact-box{transition:border-color .3s, box-shadow .3s;}
+  .contact-box:hover{box-shadow:0 20px 60px rgba(0,0,0,.35);}
+
+  @media(prefers-reduced-motion:reduce){
+    .cursor{animation:none;}
+    html{scroll-behavior:auto;}
+    .reveal, .reveal-stagger > *, .commit{opacity:1 !important;transform:none !important;transition:none !important;}
+    .hero{animation:none;opacity:1;transform:none;}
+    .bg-grid{animation:none;}
+    .terminal-body .line{opacity:1;animation:none;}
+    .btn::after{display:none;}
+  }
+  :focus-visible{outline:2px solid var(--teal);outline-offset:3px;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<div class="topbar">
+  <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+  <div class="tabs">
+    <a class="tab active" href="#about">about.js</a>
+    <a class="tab" href="#skills">skills.json</a>
+    <a class="tab" href="#projects">projects/</a>
+    <a class="tab" href="#experience">log.git</a>
+    <a class="tab" href="#contact">contact.md</a>
+  </div>
+</div>
+
+<section class="hero" id="top">
+  <div class="eyebrow">status: open to internships &amp; full-time opportunities</div>
+  <h1 class="name">Sharukh <span class="last">Ahmed</span></h1>
+  <div class="role-line"><span class="typed" id="typedRole"></span><span class="cursor"></span></div>
+
+  <div class="terminal">
+    <div class="terminal-head">
+      <span class="tdot" style="background:#E8637A"></span>
+      <span class="tdot" style="background:#E8A33D"></span>
+      <span class="tdot" style="background:#4FD1C5"></span>
+      <span class="fname">whoami.sh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="line"><span class="prompt">sharukh@dev</span>:~$ <span class="key">whoami</span></div>
+      <div class="line out">→ Full stack developer building fast, reliable, production-ready web apps.</div>
+      <div class="line"><span class="prompt">sharukh@dev</span>:~$ <span class="key">cat</span> stack.txt</div>
+      <div class="line out">→ JavaScript · React · Node.js · Express · MongoDB</div>
+      <div class="line"><span class="prompt">sharukh@dev</span>:~$ <span class="key">git</span> config user.email</div>
+      <div class="line out">→ sharukhahmed71107@gmail.com</div>
+      <div class="line"><span class="prompt">sharukh@dev</span>:~$ <span class="key">./</span>hire_me.sh</div>
+      <div class="line out">→ Let's build something. Scroll down ↓</div>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <a class="btn primary" href="#projects">View projects</a>
+    <a class="btn ghost" href="#contact">Get in touch</a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">01 — profile</div>
+      <div class="sec-title">about<span class="comment">.js</span></div>
+    </div>
+    <div class="about-grid reveal">
+      <div>
+        <p>I'm <strong>Sharukh Ahmed</strong>, a full stack developer who enjoys turning ideas into fast, usable products people actually want to use. I work comfortably across the stack — from pixel-accurate, accessible front-end interfaces to the APIs and databases that keep everything running behind the scenes.</p>
+        <p>My focus is on writing clean, maintainable code and shipping things that hold up in the real world, not just in a demo. I care about performance, attention to detail, and code the next developer won't dread reading.</p>
+        <p>I'm currently <strong>open to internships and full-time opportunities</strong> where I can contribute to real products, learn from experienced engineers, and keep growing as a developer.</p>
+      </div>
+      <div>
+        <div class="stat-card"><div class="num">MERN</div><div class="lbl">PRIMARY STACK</div></div>
+        <div class="stat-card"><div class="num">FULL</div><div class="lbl">FRONT-END TO BACK-END</div></div>
+        <div class="stat-card"><div class="num">24/7</div><div class="lbl">READY TO LEARN &amp; BUILD</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">02 — toolkit</div>
+      <div class="sec-title">skills<span class="comment">.json</span></div>
+    </div>
+    <div class="pkg reveal">
+      <div class="pkg-head">
+        <span class="tdot" style="background:#E8637A"></span>
+        <span class="tdot" style="background:#E8A33D"></span>
+        <span class="tdot" style="background:#4FD1C5"></span>
+        <span>skills.json</span>
+      </div>
+      <div class="pkg-body">
+        <div class="l">{</div>
+        <div class="indent"><span class="key">"frontend"</span>: [<span class="str">"HTML5"</span>, <span class="str">"CSS3"</span>, <span class="str">"JavaScript"</span>, <span class="str">"React"</span>, <span class="str">"Tailwind CSS"</span>],</div>
+        <div class="indent"><span class="key">"backend"</span>: [<span class="str">"Node.js"</span>, <span class="str">"Express"</span>, <span class="str">"REST APIs"</span>],</div>
+        <div class="indent"><span class="key">"database"</span>: [<span class="str">"MongoDB"</span>, <span class="str">"MySQL"</span>],</div>
+        <div class="indent"><span class="key">"tools"</span>: [<span class="str">"Git"</span>, <span class="str">"GitHub"</span>, <span class="str">"VS Code"</span>, <span class="str">"Figma"</span>, <span class="str">"Postman"</span>],</div>
+        <div class="indent"><span class="key">"currentlyLearning"</span>: [<span class="str">"TypeScript"</span>, <span class="str">"Next.js"</span>]</div>
+        <div class="l">}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">03 — selected work</div>
+      <div class="sec-title">projects<span class="comment">/</span></div>
+    </div>
+    <div class="projects reveal-stagger">
+
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-file"><span>student-management-system.js</span><span class="status">● live</span></div>
+          <div class="proj-title">The Register — Student Management System</div>
+        </div>
+        <p class="proj-desc">An admin-facing student record and enrollment ledger. Authenticated staff can add, view, and organize student profiles — full name, roll number, grade/class, email, phone, and guardian name — with unique roll-number validation and required-field checks built into the form.</p>
+        <div class="proj-stack">
+          <span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">JavaScript</span>
+        </div>
+        <div class="proj-links">
+          <a href="https://sharukhcodes.github.io/STUDENT-MANAGEMENT-SYSTEM/" target="_blank" rel="noopener">Live demo</a>
+          <a href="https://github.com/sharukhcodes/STUDENT-MANAGEMENT-SYSTEM" target="_blank" rel="noopener">Source code</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-file"><span>project-two.tsx</span><span class="status">● live</span></div>
+          <div class="proj-title">Project Name Two</div>
+        </div>
+        <p class="proj-desc">A short, results-focused description: what it does, who it's for, and the problem it solves. Swap in a real project here.</p>
+        <div class="proj-stack">
+          <span class="chip">Next.js</span><span class="chip">Tailwind</span><span class="chip">MySQL</span>
+        </div>
+        <div class="proj-links">
+          <a href="https://github.com/sharukhcodes" target="_blank" rel="noopener">Live demo</a>
+          <a href="https://github.com/sharukhcodes" target="_blank" rel="noopener">Source code</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-file"><span>project-three.tsx</span><span class="status" style="color:var(--amber)">● in progress</span></div>
+          <div class="proj-title">Project Name Three</div>
+        </div>
+        <p class="proj-desc">A short, results-focused description: what it does, who it's for, and the problem it solves. Swap in a real project here.</p>
+        <div class="proj-stack">
+          <span class="chip">JavaScript</span><span class="chip">Express</span><span class="chip">REST API</span>
+        </div>
+        <div class="proj-links">
+          <a href="https://github.com/sharukhcodes" target="_blank" rel="noopener">Live demo</a>
+          <a href="https://github.com/sharukhcodes" target="_blank" rel="noopener">Source code</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">04 — history</div>
+      <div class="sec-title">git <span class="comment">log --experience</span></div>
+    </div>
+    <div class="gitlog" id="gitlog">
+      <div class="commit">
+        <div class="commit-hash">commit a1b2c3d</div>
+        <div class="commit-msg">Role Title — Company Name</div>
+        <div class="commit-meta">Month Year — Present</div>
+        <div class="commit-body">Short description of your responsibilities and impact in this role. Add your real experience here.</div>
+      </div>
+      <div class="commit">
+        <div class="commit-hash">commit e4f5g6h</div>
+        <div class="commit-msg">Role Title — Company Name</div>
+        <div class="commit-meta">Month Year — Month Year</div>
+        <div class="commit-body">Short description of your responsibilities and impact in this role. Add your real experience here.</div>
+      </div>
+      <div class="commit">
+        <div class="commit-hash">commit i7j8k9l</div>
+        <div class="commit-msg">Started learning full stack development</div>
+        <div class="commit-meta">Month Year</div>
+        <div class="commit-body">Where your journey began — a course, a degree, or self-taught. Add your real story here.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-box reveal">
+      <div class="sec-tag" style="justify-content:center;display:flex">05 — say hello</div>
+      <div class="sec-title">contact<span class="comment">.md</span></div>
+      <p>Have a project in mind, an internship opening, or just want to connect? My inbox is open.</p>
+      <div class="contact-links">
+        <a class="btn primary" href="mailto:sharukhahmed71107@gmail.com">sharukhahmed71107@gmail.com</a>
+        <a class="btn ghost" href="https://github.com/sharukhcodes" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn ghost" href="https://www.linkedin.com/in/sharukh-ahmed-710162402/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© <span id="year"></span> Sharukh Ahmed — built line by line.</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let current = sections[0].id;
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+    });
+    tabs.forEach(t => {
+      t.classList.toggle('active', t.getAttribute('href') === '#' + current);
+    });
+  });
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- typed role line ---- */
+  const roles = ['full stack developer', 'MERN stack developer', 'problem solver'];
+  const typedEl = document.getElementById('typedRole');
+  if (typedEl) {
+    if (prefersReducedMotion) {
+      typedEl.textContent = roles[0];
+    } else {
+      let roleIdx = 0, charIdx = 0, deleting = false;
+      const TYPE_SPEED = 65, DELETE_SPEED = 35, HOLD = 1600, GAP = 400;
+      function tick(){
+        const current = roles[roleIdx];
+        if(!deleting){
+          charIdx++;
+          typedEl.textContent = current.slice(0, charIdx);
+          if(charIdx === current.length){
+            deleting = true;
+            setTimeout(tick, HOLD);
+            return;
+          }
+          setTimeout(tick, TYPE_SPEED);
+        } else {
+          charIdx--;
+          typedEl.textContent = current.slice(0, charIdx);
+          if(charIdx === 0){
+            deleting = false;
+            roleIdx = (roleIdx + 1) % roles.length;
+            setTimeout(tick, GAP);
+            return;
+          }
+          setTimeout(tick, DELETE_SPEED);
+        }
+      }
+      tick();
+    }
+  }
+
+  /* ---- staggered terminal lines ---- */
+  document.querySelectorAll('.terminal-body .line').forEach((line, i) => {
+    line.style.animationDelay = prefersReducedMotion ? '0s' : (0.15 * i + 0.3) + 's';
+  });
+
+  /* ---- scroll reveal ---- */
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => revealObserver.observe(el));
+
+    const commitObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('in'), i * 120);
+          commitObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.commit').forEach(el => commitObserver.observe(el));
+  } else {
+    document.querySelectorAll('.reveal, .reveal-stagger, .commit').forEach(el => el.classList.add('in'));
+  }
+</script>
+</body>
+</html>
